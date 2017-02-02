@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.junit.Test;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoProcessor;
 import reactor.test.StepVerifier;
 
 /**
@@ -26,7 +27,7 @@ public class Part02Mono {
 
 	// TODO Return an empty Mono
 	Mono<String> emptyMono() {
-		return null;
+		return Mono.empty();
 	}
 
 //========================================================================================
@@ -44,7 +45,7 @@ public class Part02Mono {
 
 	// TODO Return an Mono that never emit any signal
 	Mono<String> monoWithNoSignal() {
-		return null;
+		return Mono.never();
 	}
 
 //========================================================================================
@@ -60,7 +61,7 @@ public class Part02Mono {
 
 	// TODO Return a Mono that contains a "foo" value
 	Mono<String> fooMono() {
-		return null;
+		return Mono.just("foo");
 	}
 
 //========================================================================================
@@ -75,7 +76,7 @@ public class Part02Mono {
 
 	// TODO Create a Mono that emits an IllegalStateException
 	Mono<String> errorMono() {
-		return null;
+		return MonoProcessor.error(new IllegalStateException());
 	}
 
 }
