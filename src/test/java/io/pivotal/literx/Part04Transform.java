@@ -15,66 +15,71 @@ import reactor.test.StepVerifier;
  */
 public class Part04Transform {
 
-	ReactiveRepository<User> repository = new ReactiveUserRepository();
+  ReactiveRepository<User> repository = new ReactiveUserRepository();
 
 //========================================================================================
 
-	@Test
-	public void transformMono() {
-		Mono<User> mono = repository.findFirst();
-		StepVerifier.create(capitalizeOne(mono))
-				.expectNext(new User("SWHITE", "SKYLER", "WHITE"))
-				.expectComplete()
-				.verify();
-	}
+  @Test
+  public void transformMono() {
+    Mono<User> mono = repository.findFirst();
+    StepVerifier.create(capitalizeOne(mono))
+        .expectNext(new User("SWHITE", "SKYLER", "WHITE"))
+        .expectComplete()
+        .verify();
+  }
 
-	// TODO Capitalize the user username, firstname and lastname
-	Mono<User> capitalizeOne(Mono<User> mono) {
-		return null;
-	}
+  // TODO Capitalize the user username, firstname and lastname
+  Mono<User> capitalizeOne(Mono<User> mono) {
+    return mono.map(user -> createCapitalized(user));
+  }
 
-//========================================================================================
-
-	@Test
-	public void transformFlux() {
-		Flux<User> flux = repository.findAll();
-		StepVerifier.create(capitalizeMany(flux))
-				.expectNext(
-					new User("SWHITE", "SKYLER", "WHITE"),
-					new User("JPINKMAN", "JESSE", "PINKMAN"),
-					new User("WWHITE", "WALTER", "WHITE"),
-					new User("SGOODMAN", "SAUL", "GOODMAN"))
-				.expectComplete()
-				.verify();
-	}
-
-	// TODO Capitalize the users username, firstName and lastName
-	Flux<User> capitalizeMany(Flux<User> flux) {
-		return null;
-	}
+  private User createCapitalized(User user) {
+    return new User(user.getUsername().toUpperCase(),
+        user.getFirstname().toUpperCase(), user.getLastname().toUpperCase()
+    );
+  }
 
 //========================================================================================
 
-	@Test
-	public void  asyncTransformFlux() {
-		Flux<User> flux = repository.findAll();
-		StepVerifier.create(asyncCapitalizeMany(flux))
-				.expectNext(
-					new User("SWHITE", "SKYLER", "WHITE"),
-					new User("JPINKMAN", "JESSE", "PINKMAN"),
-					new User("WWHITE", "WALTER", "WHITE"),
-					new User("SGOODMAN", "SAUL", "GOODMAN"))
-				.expectComplete()
-				.verify();
-	}
+  @Test
+  public void transformFlux() {
+    Flux<User> flux = repository.findAll();
+    StepVerifier.create(capitalizeMany(flux))
+        .expectNext(
+            new User("SWHITE", "SKYLER", "WHITE"),
+            new User("JPINKMAN", "JESSE", "PINKMAN"),
+            new User("WWHITE", "WALTER", "WHITE"),
+            new User("SGOODMAN", "SAUL", "GOODMAN"))
+        .expectComplete()
+        .verify();
+  }
 
-	// TODO Capitalize the users username, firstName and lastName using asyncCapitalizeUser()
-	Flux<User> asyncCapitalizeMany(Flux<User> flux) {
-		return null;
-	}
+  // TODO Capitalize the users username, firstName and lastName
+  Flux<User> capitalizeMany(Flux<User> flux) {
+    return flux.map(this::createCapitalized);
+  }
 
-	Mono<User> asyncCapitalizeUser(User u) {
-		return Mono.just(new User(u.getUsername().toUpperCase(), u.getFirstname().toUpperCase(), u.getLastname().toUpperCase()));
-	}
+//========================================================================================
 
+  @Test
+  public void asyncTransformFlux() {
+    Flux<User> flux = repository.findAll();
+    StepVerifier.create(asyncCapitalizeMany(flux))
+        .expectNext(
+            new User("SWHITE", "SKYLER", "WHITE"),
+            new User("JPINKMAN", "JESSE", "PINKMAN"),
+            new User("WWHITE", "WALTER", "WHITE"),
+            new User("SGOODMAN", "SAUL", "GOODMAN"))
+        .expectComplete()
+        .verify();
+  }
+
+  // TODO Capitalize the users username, firstName and lastName using asyncCapitalizeUser()
+  Flux<User> asyncCapitalizeMany(Flux<User> flux) {
+    return flux.flatMap(this::asyncCapitalizeUser);
+  }
+
+  Mono<User> asyncCapitalizeUser(User u) {
+    return Mono.just(createCapitalized(u));
+  }
 }
